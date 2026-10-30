@@ -15,242 +15,339 @@
   <a href="http://my-app-env.eba-zdvy2nem.ap-southeast-2.elasticbeanstalk.com/swagger-ui/index.html"><b>🔗 Live Swagger API Documentation</b></a>
 </p>
 ---
-📑 Table of Contents
-About · Features · Tech Stack · Architecture · Database · API Reference · Run Locally · Auth Guide · Deployment · Roadmap · Author
----
-📖 About the Project
-ShopSphere is a RESTful backend for an online store. Users can register and sign in, browse products by category, keep a shopping cart, save delivery addresses and place orders with payment-gateway details. Sellers and admins manage the product catalogue.
-It demonstrates a clean Controller → Service → Repository architecture, DTO-based request/response handling, stateless JWT security, global exception handling, pagination & sorting, and cloud deployment.
----
-✨ Features
-🔐 JWT authentication – sign up, sign in (JWT returned as a cookie), sign out, current-user info
-👥 Role model – `ROLE_USER`, `ROLE_SELLER`, `ROLE_ADMIN` assigned at signup
-🗂️ Categories – create, list (paginated & sorted), update, delete
-📦 Products – add to a category, list, filter by category, search by keyword, update, delete, upload image
-🛒 Shopping cart – add items, increase/decrease quantity, remove items, automatic total price
-📍 Address book – full CRUD, multiple addresses per user
-💳 Order placement – payment method plus payment-gateway details
-⚠️ Global exception handling with consistent error responses
-✅ Bean validation on request bodies
-📘 Swagger UI for interactive testing
-☁️ Deployed on AWS (Elastic Beanstalk + MySQL)
----
-🧰 Tech Stack
-Layer	Technology
-Language	Java 21
-Framework	Spring Boot 3.2.5 (Web, Data JPA, Validation)
-Security	Spring Security, JWT (jjwt 0.12.5), BCrypt
-Database	MySQL
-ORM	Hibernate / Spring Data JPA
-Mapping	ModelMapper 3.0.0
-API Docs	springdoc-openapi 2.5.0 (Swagger UI)
-Build	Maven (wrapper included)
-Utilities	Lombok
-Cloud	AWS Elastic Beanstalk / EC2, MySQL database
----
-🏗️ Architecture
-```mermaid
-flowchart LR
-    Client["Client<br/>(Browser / Postman / Swagger UI)"] --> Filter["JWT Filter<br/>Spring Security"]
-    Filter --> Controller["Controllers<br/>Address · Auth · Cart · Category · Order · Product"]
-    Controller --> Service["Services<br/>business logic + DTO mapping"]
-    Service --> Repository["Repositories<br/>Spring Data JPA"]
-    Repository --> DB[("MySQL")]
-```
-Authentication flow
-```mermaid
-sequenceDiagram
-    participant C as Client
-    participant S as ShopSphere API
-    C->>S: POST /api/auth/signin (username, password)
-    S->>S: Authenticate and generate JWT
-    S-->>C: 200 OK + JWT cookie + user info
-    C->>S: Request with JWT (cookie or Authorization Bearer)
-    S->>S: AuthTokenFilter validates token
-    S-->>C: 200 OK if valid, 401 Unauthorized if not
-```
+Overview
+ShopSphere is a RESTful e-commerce backend organized around a layered
+architecture. It exposes APIs for user authentication, product and
+category management, shopping carts, customer addresses, and order
+placement. The codebase separates HTTP handling, business logic, and
+database access into controller, service, and repository layers.
+> \*\*API documentation:\*\* \[Open the deployed Swagger
+> UI](http://my-app-env.eba-zdvy2nem.ap-southeast-2.elasticbeanstalk.com/swagger-ui/index.html).
+> The deployment URL is currently HTTP, so availability and browser
+> behavior may vary. You can also run the application locally and open
+> the local Swagger UI.
+Table of contents
+Highlights
+Technology stack
+Architecture
+Request lifecycle
+API overview
+Data model
 Project structure
+Run locally
+Environment configuration
+Build and run the JAR
+Deployment
+Visual documentation
+Potential next steps
+Author
+Highlights
+Authentication: sign-up, sign-in, sign-out, and
+authenticated-user information.
+JWT and Spring Security: token-based authentication and request
+filtering.
+Product APIs: browse products, search by keyword, filter by
+category, update product details, and upload product images.
+Category APIs: category creation, updates, deletion, and
+paginated listing.
+Cart APIs: add products, retrieve carts, update quantities, and
+remove cart items.
+Address APIs: create, retrieve, update, and delete addresses.
+Order APIs: order placement and payment-method request handling.
+DTO-based API contracts: payload classes separate API
+request/response data from persistence entities.
+Validation and error handling: Jakarta Bean Validation and
+centralized exception handling.
+Interactive API docs: Swagger UI / OpenAPI through springdoc.
+Persistence: MySQL through Spring Data JPA and Hibernate.
+Technology stack
+Technology                    Role in the project
+---
+Java 21                       Application language
+Spring Boot 3.2.5             Application setup and auto-configuration
+Spring Web                    REST controllers and HTTP APIs
+Spring Security               Authentication and endpoint security
+JJWT 0.12.5                   JWT creation and validation
+Spring Data JPA / Hibernate   ORM and database persistence
+MySQL                         Relational database
+Maven                         Dependency management and build
+springdoc-openapi 2.5.0       OpenAPI specification and Swagger UI
+ModelMapper                   DTO/entity mapping
+Jakarta Bean Validation       Request validation
+Lombok                        Boilerplate reduction
+Architecture
+The project follows a layered backend design:
+``` text
+Client (Browser / Postman)
+          |
+          v
+   REST Controllers
+          |
+          v
+   Service Interfaces
+          |
+          v
+ Service Implementations
+          |
+          v
+ Spring Data Repositories
+          |
+          v
+        MySQL
 ```
-shopsphere-springboot-ecommerce-api
-├── src/main/java/com/ecommerce/project
-│   ├── config            # AppConfig, AppConstants, SwaggerConfig
-│   ├── controller        # Address, Auth, Cart, Category, Order, Product
-│   ├── exceptions        # APIException, ResourceNotFoundException, global handler
-│   ├── model             # JPA entities
-│   ├── payload           # DTOs and response wrappers
-│   ├── repositories      # Spring Data JPA repositories
-│   ├── security          # WebSecurityConfig, jwt/, request/, response/, services/
-│   ├── service           # Service interfaces + implementations
-│   └── util              # AuthUtil
-├── src/main/resources
-│   └── application.properties.example
-├── docs/images           # README screenshots
+Layer responsibilities
+---
+Layer                               Responsibility
+---
+`controller`                        Accepts HTTP requests, binds
+request data, and returns HTTP
+responses.
+`service`                           Holds application/business logic
+and coordinates operations.
+`repositories`                      Reads and writes data using Spring
+Data JPA.
+`model`                             Contains JPA entities such as
+`User`, `Product`, `Category`,
+`Cart`, and `Order`.
+`payload`                           Contains DTOs and response models
+used by the API.
+`security`                          Configures Spring Security and the
+JWT request flow.
+`config`                            Contains application constants,
+bean configuration, and Swagger
+configuration.
+`exceptions`                        Contains custom exceptions and
+global exception handling.
+`util`                              Contains shared utilities,
+including authentication-related
+helpers.
+![ShopSphere layered architecture](images/architecture-layered.png)
+Request lifecycle
+A client sends an HTTP request.
+Spring Security processes the request and applies the configured
+authentication rules.
+The controller receives the request and calls the relevant service.
+The service performs application logic and calls a repository when
+persistence is needed.
+The repository accesses MySQL through JPA/Hibernate.
+The application maps the result to a response DTO and returns an
+HTTP response.
+![DTO and entity request-response flow](images/dto-entity-flow.png)
+API overview
+This table summarizes key endpoint groups. Use Swagger UI as the source
+of truth for full schemas, status codes, and authorization requirements.
+---
+Module           Example endpoint                                                       Method Purpose
+---
+Authentication   `/api/auth/signup`                                                     `POST` Register a user
+Authentication   `/api/auth/signin`                                                     `POST` Authenticate a user
+Authentication   `/api/auth/signout`                                                    `POST` Sign out / clear the
+authentication
+cookie
+Authentication   `/api/auth/username`                                                    `GET` Retrieve the
+authenticated
+username
+Authentication   `/api/auth/user`                                                        `GET` Retrieve
+authenticated-user
+information
+Categories       `/api/public/categories`                                                `GET` List categories with
+pagination/sorting
+Products         `/api/public/products`                                                  `GET` List products with
+pagination/sorting
+Products         `/api/public/categories/{categoryId}/products`                          `GET` List products for a
+category
+Products         `/api/public/products/keyword/{keyword}`                                `GET` Search products by
+keyword
+Cart             `/api/carts/products/{productId}/quantity/{quantity}`                  `POST` Add a product to the
+cart
+Cart             `/api/carts/users/cart`                                                 `GET` Retrieve the
+logged-in user's
+cart
+Addresses        `/api/addresses`                                                       `POST` Create an address
+Addresses        `/api/users/addresses`                                                  `GET` Retrieve the
+logged-in user's
+addresses
+Orders           `/api/order/users/payments/{paymentMethod}`                            `POST` Place an order using
+a payment method
+Important API notes
+Some endpoints are intended for authenticated users or specific
+roles.
+Do not assume every endpoint is public. Check `WebSecurityConfig`
+and Swagger descriptions for the actual rules.
+The project configures JWT cookies. Test authentication in
+Swagger/Postman according to the implementation.
+Exact response codes and schemas vary by endpoint; inspect the
+OpenAPI docs for the current contract.
+Data model
+The visible schema includes users and roles, products and categories,
+carts and cart items, orders and order items, payments, and addresses.
+![ShopSphere database schema](images/database-schema.png)
+Project structure
+``` text
+sb-ecom/
+├── src/
+│   ├── main/
+│   │   ├── java/com/ecommerce/project/
+│   │   │   ├── config/                  # App configuration and Swagger
+│   │   │   ├── controller/              # Address, Auth, Cart, Category,
+│   │   │   │                            # Order, and Product controllers
+│   │   │   ├── exceptions/              # Custom exceptions and global handler
+│   │   │   ├── model/                   # JPA entities and role model
+│   │   │   ├── payload/                 # DTOs and response objects
+│   │   │   ├── repositories/            # Spring Data JPA repositories
+│   │   │   ├── security/
+│   │   │   │   ├── jwt/                 # JWT filter, utilities, entry point
+│   │   │   │   ├── request/             # Login and signup payloads
+│   │   │   │   ├── response/            # Authentication/user responses
+│   │   │   │   └── services/            # User-details services
+│   │   │   ├── service/                 # Service interfaces/implementations
+│   │   │   ├── util/                    # Shared utilities
+│   │   │   └── SbEcomApplication.java   # Application entry point
+│   │   └── resources/
+│   │       └── application.properties   # Environment-based configuration
+│   └── test/
+├── images/                              # Architecture and API diagrams
+├── .gitignore
+├── mvnw
+├── mvnw.cmd
 └── pom.xml
 ```
----
-🗃️ Database Design
-```mermaid
-erDiagram
-    USERS ||--o| CARTS : owns
-    USERS ||--o{ ADDRESSES : has
-    USERS }o--o{ ROLES : "user_role"
-    USERS ||--o{ PRODUCTS : sells
-    CATEGORIES ||--o{ PRODUCTS : contains
-    CARTS ||--o{ CART_ITEMS : holds
-    PRODUCTS ||--o{ CART_ITEMS : "added as"
-    ORDERS ||--o{ ORDER_ITEMS : contains
-    PRODUCTS ||--o{ ORDER_ITEMS : "ordered as"
-    ORDERS ||--|| PAYMENTS : "paid by"
-    ORDERS }o--|| ADDRESSES : "ships to"
-
-    USERS {
-        bigint user_id PK
-        string username
-        string email
-        string password
-    }
-    PRODUCTS {
-        bigint product_id PK
-        string product_name
-        double price
-        double discount
-        double special_price
-        int quantity
-    }
-    ORDERS {
-        bigint order_id PK
-        string email
-        date order_date
-        double total_amount
-        string order_status
-    }
-    PAYMENTS {
-        bigint payment_id PK
-        string payment_method
-        string pg_name
-        string pg_status
-    }
-```
----
-📚 API Reference
-Base path: `/api` · Interactive docs: Swagger UI
-Swagger screenshots
-Overview	Authentication
-![Swagger overview](docs/images/swagger-overview.png)	![Auth APIs](docs/images/swagger-auth.png)
-
-Categories & Products	Cart, Address & Orders
-![Category and product APIs](docs/images/swagger-catalog.png)	![Cart, address and order APIs](docs/images/swagger-cart-order.png)
-🔑 Authentication – `/api/auth`
-Method	Endpoint	Description	Access
-POST	`/api/auth/signup`	Register a new user	Public
-POST	`/api/auth/signin`	Log in, returns JWT cookie + user info	Public
-POST	`/api/auth/signout`	Log out (clears cookie)	Public
-GET	`/api/auth/username`	Current username	Public route, needs a valid JWT
-GET	`/api/auth/user`	Current user details	Public route, needs a valid JWT
-🗂️ Categories
-Method	Endpoint	Description	Access
-GET	`/api/public/categories`	List categories (`pageNumber`, `pageSize`, `sortBy`, `sortOrder`)	Public
-POST	`/api/public/categories`	Create a category	Public
-PUT	`/api/public/categories/{categoryId}`	Update a category	Public
-DELETE	`/api/admin/categories/{categoryId}`	Delete a category	Authenticated
-📦 Products
-Method	Endpoint	Description	Access
-POST	`/api/admin/categories/{categoryId}/product`	Add a product to a category	Authenticated
-GET	`/api/public/products`	List all products (paginated)	Public
-GET	`/api/public/categories/{categoryId}/products`	Products by category	Public
-GET	`/api/public/products/keyword/{keyword}`	Search products by keyword	Public
-PUT	`/api/admin/products/{productId}`	Update a product	Authenticated
-PUT	`/api/products/{productId}/image`	Upload product image (`multipart/form-data`, field `image`)	Authenticated
-DELETE	`/api/admin/products/{productId}`	Delete a product	Authenticated
-🛒 Cart
-Method	Endpoint	Description	Access
-POST	`/api/carts/products/{productId}/quantity/{quantity}`	Add product to cart	Authenticated
-GET	`/api/carts`	List all carts	Authenticated
-GET	`/api/carts/users/cart`	Logged-in user's cart	Authenticated
-PUT	`/api/cart/products/{productId}/quantity/{operation}`	Update quantity (`add` / `delete`)	Authenticated
-DELETE	`/api/carts/{cartId}/product/{productId}`	Remove product from cart	Authenticated
-📍 Addresses
-Method	Endpoint	Description	Access
-POST	`/api/addresses`	Create an address	Authenticated
-GET	`/api/addresses`	List all addresses	Authenticated
-GET	`/api/addresses/{addressId}`	Get address by ID	Authenticated
-GET	`/api/users/addresses`	Logged-in user's addresses	Authenticated
-PUT	`/api/addresses/{addressId}`	Update an address	Authenticated
-DELETE	`/api/addresses/{addressId}`	Delete an address	Authenticated
-🧾 Orders
-Method	Endpoint	Description	Access
-POST	`/api/order/users/payments/{paymentMethod}`	Place an order	Authenticated
-<details>
-<summary><b>Sample request – place an order</b></summary>
-```json
-POST /api/order/users/payments/UPI
-{
-  "addressId": 1,
-  "pgName": "Razorpay",
-  "pgPaymentId": "pay_123456",
-  "pgStatus": "success",
-  "pgResponseMessage": "Payment successful"
-}
-```
-</details>
----
-🚀 Getting Started
+Run locally
 Prerequisites
-Java 21 · MySQL 8+ · Git (Maven wrapper is included)
-1. Clone
-```bash
+JDK 21
+Git
+MySQL Server
+Eclipse or another Java IDE (optional)
+Verify Java and Git:
+``` bash
+java -version
+git --version
+```
+1. Clone the repository
+``` bash
 git clone https://github.com/akashsonu0/shopsphere-springboot-ecommerce-api.git
 cd shopsphere-springboot-ecommerce-api
 ```
-2. Create the database
-```sql
-CREATE DATABASE ecommerce;
+2. Create a database
+``` sql
+CREATE DATABASE shopsphere;
 ```
-3. Configure
-```bash
-cp src/main/resources/application.properties.example src/main/resources/application.properties
+Use a dedicated local database user where practical.
+3. Set environment variables
+The application expects `DB\_URL`, `DB\_USERNAME`, `DB\_PASSWORD`, and
+`JWT\_SECRET`.
+For local MySQL, `DB\_URL` typically looks like:
+``` text
+jdbc:mysql://localhost:3306/shopsphere
 ```
-Edit `application.properties` and set your DB username/password and a Base64 JWT secret:
-```bash
-openssl rand -base64 48
+Windows PowerShell example (values apply only to the current
+terminal session):
+``` powershell
+$env:DB\_URL="jdbc:mysql://localhost:3306/shopsphere"
+$env:DB\_USERNAME="your\_local\_db\_username"
+$env:DB\_PASSWORD="your\_local\_db\_password"
+$env:JWT\_SECRET="replace\_with\_a\_strong\_secret\_compatible\_with\_your\_jwt\_library"
+.\\mvnw.cmd spring-boot:run
 ```
-> `application.properties` is git-ignored, so your secrets are never published.
-4. Run
-```bash
-./mvnw spring-boot:run          # Git Bash / Linux / macOS
-mvnw.cmd spring-boot:run        # Windows CMD
+Git Bash example:
+``` bash
+export DB\_URL="jdbc:mysql://localhost:3306/shopsphere"
+export DB\_USERNAME="your\_local\_db\_username"
+export DB\_PASSWORD="your\_local\_db\_password"
+export JWT\_SECRET="replace\_with\_a\_strong\_secret\_compatible\_with\_your\_jwt\_library"
+./mvnw spring-boot:run
 ```
-API: `http://localhost:5000`
+Use a strong, randomly generated JWT secret that meets the JWT library's
+key-strength requirements. Do not reuse a production secret in local
+development.
+4. Open Swagger UI
+The project is configured for port `5000`.
 Swagger UI: `http://localhost:5000/swagger-ui/index.html`
-On first start the app creates the three roles and a few demo accounts (`user1`, `seller1`, `admin`). See `WebSecurityConfig.initData` for details and change or remove these before any real deployment.
----
-🔐 Authentication Guide
-Create an account with `POST /api/auth/signup` (or use a seeded demo account locally).
-Call `POST /api/auth/signin`. The JWT is stored in the `springBootEcom` cookie.
-In Swagger UI the browser sends that cookie automatically. In Postman, either keep the cookie or send `Authorization: Bearer <token>`.
-Call any protected endpoint.
----
-☁️ Deployment
-```mermaid
-flowchart LR
-    U["Browser / Postman"] --> EB["AWS Elastic Beanstalk<br/>EC2 - Spring Boot JAR on port 5000"]
-    EB --> DB[("MySQL database")]
+OpenAPI JSON: `http://localhost:5000/v3/api-docs`
+If you change `server.port`, update these URLs.
+Environment configuration
+The main configuration reads database credentials and the JWT signing
+secret from environment variables:
+``` properties
+spring.datasource.url=${DB\_URL}
+spring.datasource.username=${DB\_USERNAME}
+spring.datasource.password=${DB\_PASSWORD}
+spring.app.jwtSecret=${JWT\_SECRET}
 ```
-```bash
-./mvnw clean package -DskipTests
-# upload target/sb-ecom-0.0.1-SNAPSHOT.jar to Elastic Beanstalk
+Other settings in the supplied configuration include:
+`spring.jpa.hibernate.ddl-auto=update`
+`spring.app.jwtExpirationMs=3000000`
+`spring.ecom.app.jwtCookieName=springBootEcom`
+`project.image=images/`
+`server.port=5000`
+Production checklist
+Keep secrets out of source control and rotate any secret that has
+already been committed.
+Use HTTPS for public traffic.
+Reduce verbose debug logging, especially security-related logs.
+Restrict database access to the application environment and trusted
+sources.
+Consider database migrations instead of `ddl-auto=update` for
+production schema changes.
+Review authentication, role permissions, and resource-ownership
+checks for sensitive operations.
+Build and run the JAR
+Windows:
+``` bash
+mvnw.cmd clean package
 ```
-Configure these environment properties in Elastic Beanstalk (no secrets live in the repo): `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `JWT_SECRET`.
----
-🗺️ Roadmap
-[ ] Enforce role-based access (`@EnableMethodSecurity` + `@PreAuthorize`) on admin/seller routes
-[ ] Unit and integration tests
-[ ] Docker + GitHub Actions CI/CD
-[ ] Real payment-gateway integration (Razorpay / Stripe)
-[ ] Order history and status tracking
-[ ] React frontend
----
-👨‍💻 Author
+Git Bash / macOS / Linux:
+``` bash
+./mvnw clean package
+```
+The JAR should be generated in `target/`. Run it using the actual
+filename produced by the build, for example:
+``` bash
+java -jar target/sb-ecom-0.0.1-SNAPSHOT.jar
+```
+If the filename differs, check `target/` and use the generated name.
+Deployment
+The supplied deployment diagram describes an AWS Elastic Beanstalk
+application connected to MySQL on Amazon RDS.
+![AWS deployment architecture](images/aws-deployment-architecture.png)
+Configure secrets in the hosting environment rather than committing
+them. Verify that the RDS security group allows access only from the
+required application environment and that public traffic uses HTTPS.
+Visual documentation
+Authentication and JWT flow
+![JWT authentication flow](images/jwt-authentication-flow.png)
+Authentication endpoints
+![Authentication endpoint](images/authentication-endpoints.png)
+Category endpoints
+![Category endpoint reference](images/category-endpoints.png)
+Product endpoints
+![Product endpoint reference - part](images/product-endpoints-part-1.png)
+![Product endpoint reference - part](images/product-endpoints-part-2.png)
+Cart endpoints
+![Cart endpoint reference](images/cart-endpoints.png)
+Address endpoints
+![Address endpoint reference - part](images/address-endpoints-part-1.png)
+![Address endpoint reference - part](images/address-endpoints-part-2.png)
+Potential next steps
+These are suggested future improvements, not claims that they are
+already implemented:
+Add integration tests for authentication, authorization, cart
+operations, and order placement.
+Review role-based access control and ownership checks for sensitive
+operations.
+Add database migrations for repeatable schema changes.
+Use `BigDecimal` for currency calculations instead of floating-point
+types.
+Add consistent validation and error-response examples to API
+documentation.
+Add CI checks to run tests and package the application.
+Configure HTTPS and managed secrets for deployment.
+Author
 Akash Sonu
-![GitHub](https://img.shields.io/badge/GitHub-akashsonu0-black?logo=github)
-⭐ If you found this project useful, please give it a star!
+GitHub: @akashsonu0
+Project repository:
+shopsphere-springboot-ecommerce-api
+License
+No license is specified in this repository at the time of writing. Add a
+`LICENSE` file if you intend to grant others permission to reuse,
+modify, or distribute the project.
