@@ -1,13 +1,36 @@
- HEAD
-# ShopSphere - Spring Boot E-Commerce REST API
+<h1 align="center">🛍️ ShopSphere – Spring Boot E-Commerce REST API</h1>
+<p align="center">
+  A secure e-commerce backend built with <b>Spring Boot 3</b>, <b>Spring Security + JWT</b>, <b>JPA/Hibernate</b> and <b>MySQL</b>,<br/>
+  documented with <b>Swagger (OpenAPI 3)</b> and deployed on <b>AWS</b>.
+</p>
+<p align="center">
+  <img src="https://img.shields.io/badge/Java-21-orange" alt="Java"/>
+  <img src="https://img.shields.io/badge/Spring%20Boot-3.2.5-brightgreen" alt="Spring Boot"/>
+  <img src="https://img.shields.io/badge/MySQL-8-blue" alt="MySQL"/>
+  <img src="https://img.shields.io/badge/Auth-JWT-purple" alt="JWT"/>
+  <img src="https://img.shields.io/badge/API%20Docs-Swagger-85EA2D" alt="Swagger"/>
+  <img src="https://img.shields.io/badge/Cloud-AWS-yellow" alt="AWS"/>
+</p>
+<p align="center">
+  <a href="http://my-app-env.eba-zdvy2nem.ap-southeast-2.elasticbeanstalk.com/swagger-ui/index.html"><b>🔗 Live Swagger API Documentation</b></a>
+</p>
 
-![Java](https://img.shields.io/badge/Java-21-orange) ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.5-brightgreen) ![MySQL](https://img.shields.io/badge/MySQL-8-blue) ![JWT](https://img.shields.io/badge/Auth-JWT-purple) ![Swagger](https://img.shields.io/badge/API%20Docs-Swagger-85EA2D) ![AWS](https://img.shields.io/badge/Cloud-AWS-yellow)
-
-A secure e-commerce backend built with Spring Boot 3, Spring Security (JWT), Spring Data JPA and MySQL. It is documented with Swagger (OpenAPI 3) and deployed on AWS.
-
-**Live API documentation:** [Open Swagger UI](http://my-app-env.eba-zdvy2nem.ap-southeast-2.elasticbeanstalk.com/swagger-ui/index.html)
-
+ShopSphere --- E-Commerce REST API
+A Spring Boot backend for an e-commerce application
+Built with Java 21, Spring Boot, Spring Security, JWT, Spring Data JPA,
+and MySQL.
+GitHub Profile ·
+Repository
+· Live Swagger
+UI
+:::
 ---
+Overview
+ShopSphere is a RESTful e-commerce backend organized around a layered
+architecture. It exposes APIs for user authentication, product and
+category management, shopping carts, customer addresses, and order
+placement. The codebase separates HTTP handling, business logic, and
+database access into controller, service, and repository layers.
 
 ## Table of Contents
 
